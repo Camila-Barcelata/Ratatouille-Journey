@@ -7,6 +7,8 @@
  https://www.arduino.cc/en/Tutorial/LibraryExamples/Sweep
 */
 
+// Code for stirring pot during Scene 5
+
 #include <Servo.h>
 
 Servo myservo;  // create Servo object to control a servo
