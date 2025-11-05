@@ -27,6 +27,7 @@ void loop() {
     myservo.write(pos);              // tell servo to go to position in variable 'pos'
     delay(10);                       // waits 15 ms for the servo to reach the position
   }
+ // start of copper tape code:
   if digitalRead == HIGH;
 
 
