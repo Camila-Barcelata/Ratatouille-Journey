@@ -1,0 +1,36 @@
+// Frame 1
+#include <Servo.h>
+
+Servo myservo;
+
+int servoPin = 9;         
+int buttonPin = 2;       
+int angle = 0;           
+bool flipped = false;    
+
+void setup() {
+  myservo.attach(servoPin);
+  pinMode(buttonPin, INPUT_PULLUP);  
+  myservo.write(angle);              
+}
+
+void loop() {
+  // When the button (or copper tape) is pressed
+  if (digitalRead(buttonPin) == LOW) {
+    delay(10); 
+
+    if (!flipped) {
+      myservo.write(180);  
+      flipped = true;
+    } else {
+      myservo.write(0);    
+      flipped = false;
+    }
+
+    delay(100);  
+    
+    
+    while (digitalRead(buttonPin) == LOW);
+    delay(50);
+  }
+}
