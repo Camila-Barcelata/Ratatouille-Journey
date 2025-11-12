@@ -1,0 +1,42 @@
+#include <Servo.h>
+
+Servo servo6;
+
+const int SERVO6_PIN = 9;   
+const int BUTTON_PIN = 5;   
+const int PIEZO_PIN = 4;    
+
+bool wasPressed = false;   
+
+void setup() {
+  servo6.attach(SERVO6_PIN);
+  servo6.write(0);
+
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(PIEZO_PIN, OUTPUT);
+}
+
+void loop() {
+  int buttonState = digitalRead(BUTTON_PIN);
+
+  if (buttonState == LOW) { 
+    servo6.write(180);
+
+    if (!wasPressed) {
+      playYummySound();     
+      wasPressed = true;
+    }
+  } else { 
+    servo6.write(0);
+    noTone(PIEZO_PIN);
+    wasPressed = false;
+  }
+}
+
+void playYummySound() {
+  tone(4, 392, 180); delay(200);  
+  tone(4, 523, 180); delay(200); 
+  tone(4, 659, 220); delay(250);  
+  tone(4, 784, 280); delay(300);  
+  noTone(4);
+}
