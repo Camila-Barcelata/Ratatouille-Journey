@@ -1,9 +1,9 @@
 #include <Servo.h>
 
-Servo servo1;   
-Servo servo2;   
-Servo servo3;   
-Servo servo4;   
+Servo servo1;   #scene 1
+Servo servo2;   #scene 2
+Servo servo3;   #scene 3
+Servo servo4;   #scene 4
 
 const int servo1Pin  = 11;
 const int servo2Pin  = 9;
