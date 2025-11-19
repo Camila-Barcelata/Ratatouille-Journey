@@ -1,42 +1,141 @@
 #include <Servo.h>
 
-Servo servo6;
+#define NOTE_C3  131
+#define NOTE_CS3 139
+#define NOTE_D3  147
+#define NOTE_DS3 156
+#define NOTE_E3  165
+#define NOTE_F3  175
+#define NOTE_FS3 185
+#define NOTE_G3  196
+#define NOTE_GS3 208
+#define NOTE_A3  220
+#define NOTE_AS3 233
+#define NOTE_B3  247
+#define NOTE_C4  262
+#define NOTE_CS4 277
+#define NOTE_D4  294
+#define NOTE_DS4 311
+#define NOTE_E4  330
+#define NOTE_F4  349
+#define NOTE_FS4 370
+#define NOTE_G4  392
+#define NOTE_GS4 415
+#define NOTE_A4  440
+#define NOTE_AS4 466
+#define NOTE_B4  494
+#define NOTE_C5  523
 
-const int SERVO6_PIN = 9;   
-const int BUTTON_PIN = 5;   
-const int PIEZO_PIN = 4;    
+int leFestin[] = {
+  NOTE_G3, NOTE_E4, NOTE_D4, NOTE_C4, NOTE_E4, NOTE_D4, NOTE_C4, NOTE_E4, NOTE_D4, NOTE_C4,
+  NOTE_G3, NOTE_G3, NOTE_G4, NOTE_D4, NOTE_C4, NOTE_G4, NOTE_B3, NOTE_B3, NOTE_G4, NOTE_D4,
+  NOTE_B3, NOTE_C4
+};
 
-bool wasPressed = false;   
+int noteDurations[] = {
+  8, 4, 4, 4, 4, 3, 8, 4, 4, 4,
+  2, 8, 4, 4, 4, 4, 3, 8, 4, 3,
+  8, 2
+};
+
+const int NUM_NOTES = 22;   
+
+Servo servo5;   
+Servo servo6;   
+
+const int servo5Pin  = 10;
+const int servo6Pin  = 9;
+
+const int button5Pin = 6;  
+const int button6Pin = 5;  
+const int ledPin     = 7;
+const int piezoPin   = 4;  
+
+
+int servoAngle = 0;
+int servoStep  = 2;
+
+int blinkCounter = 0;
+bool ledState = false;
+
+
+int lastButton6 = HIGH;
 
 void setup() {
-  servo6.attach(SERVO6_PIN);
-  servo6.write(0);
+  servo5.attach(servo5Pin);
+  servo6.attach(servo6Pin);
 
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  pinMode(PIEZO_PIN, OUTPUT);
+  pinMode(button5Pin, INPUT_PULLUP);
+  pinMode(button6Pin, INPUT_PULLUP);
+
+  pinMode(ledPin, OUTPUT);
+  pinMode(piezoPin, OUTPUT);
+
+  digitalWrite(ledPin, LOW);
+
+  
+  servo5.write(0);
+
+  
+  servo6.write(90);   
 }
 
 void loop() {
-  int buttonState = digitalRead(BUTTON_PIN);
-
-  if (buttonState == LOW) { 
-    servo6.write(180);
-
-    if (!wasPressed) {
-      playYummySound();     
-      wasPressed = true;
+  
+  int b5 = digitalRead(button5Pin);
+  if (b5 == LOW) { 
+    servoAngle += servoStep;
+    if (servoAngle >= 90 || servoAngle <= 0) {
+      servoStep = -servoStep;
     }
-  } else { 
-    servo6.write(0);
-    noTone(PIEZO_PIN);
-    wasPressed = false;
+    servo5.write(servoAngle);
+
+    blinkCounter++;
+    if (blinkCounter >= 100) {
+      ledState = !ledState;
+      digitalWrite(ledPin, ledState);
+      blinkCounter = 0;
+    }
+
+  } else {
+    
+    servoAngle = 0;
+    servo5.write(0);
+    digitalWrite(ledPin, LOW);
+    ledState = false;
+    blinkCounter = 0;
   }
+
+  
+  int b6 = digitalRead(button6Pin);
+
+  
+  if (b6 == LOW && lastButton6 == HIGH) {
+    playYummy();          
+
+    servo6.write(0);      
+
+    delay(300);         
+
+    servo6.write(90);   
+  }
+
+  lastButton6 = b6;
+
+  delay(25);
 }
 
-void playYummySound() {
-  tone(4, 392, 180); delay(200);  
-  tone(4, 523, 180); delay(200); 
-  tone(4, 659, 220); delay(250);  
-  tone(4, 784, 280); delay(300);  
-  noTone(4);
+
+void playYummy() {
+  for (int thisNote = 0; thisNote < NUM_NOTES; thisNote++) {
+    
+    int noteDuration = 1000 / noteDurations[thisNote];
+    
+    tone(piezoPin, leFestin[thisNote], noteDuration);
+    
+    int pauseBetweenNotes = noteDuration * 1.5;
+    delay(pauseBetweenNotes);
+
+    noTone(piezoPin);
+  }
 }
