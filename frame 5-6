@@ -1,4 +1,4 @@
-#include <Servo.h>
+#include <Servo.h> 
 
 #define NOTE_C3  131
 #define NOTE_CS3 139
@@ -38,19 +38,18 @@ int noteDurations[] = {
   8, 2
 };
 
-const int NUM_NOTES = 22;   
+const int NUM_NOTES = 22;
 
-Servo servo5;   
+Servo servo5;
 Servo servo6;   
 
 const int servo5Pin  = 10;
 const int servo6Pin  = 9;
 
-const int button5Pin = 6;  
-const int button6Pin = 5;  
+const int button5Pin = 6;
+const int button6Pin = 5;
 const int ledPin     = 7;
-const int piezoPin   = 4;  
-
+const int piezoPin   = 4;
 
 int servoAngle = 0;
 int servoStep  = 2;
@@ -58,8 +57,8 @@ int servoStep  = 2;
 int blinkCounter = 0;
 bool ledState = false;
 
-
 int lastButton6 = HIGH;
+bool servo6Triggered = false;   
 
 void setup() {
   servo5.attach(servo5Pin);
@@ -71,19 +70,17 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(piezoPin, OUTPUT);
 
-  digitalWrite(ledPin, LOW);
-
-  
   servo5.write(0);
 
   
-  servo6.write(90);   
+  servo6.write(90);
 }
 
 void loop() {
   
   int b5 = digitalRead(button5Pin);
-  if (b5 == LOW) { 
+
+  if (b5 == LOW) {
     servoAngle += servoStep;
     if (servoAngle >= 90 || servoAngle <= 0) {
       servoStep = -servoStep;
@@ -98,7 +95,6 @@ void loop() {
     }
 
   } else {
-    
     servoAngle = 0;
     servo5.write(0);
     digitalWrite(ledPin, LOW);
@@ -109,33 +105,32 @@ void loop() {
   
   int b6 = digitalRead(button6Pin);
 
-  
-  if (b6 == LOW && lastButton6 == HIGH) {
-    playYummy();          
+  if (!servo6Triggered) {
+    
+    if (b6 == LOW && lastButton6 == HIGH) {
+      
+      servo6.write(75);     
+      delay(400);           
+      servo6.write(90);    
 
-    servo6.write(0);      
+      // 2) then play the song
+      playYummy();
 
-    delay(300);         
-
-    servo6.write(90);   
+      
+      servo6Triggered = true;
+    }
   }
 
   lastButton6 = b6;
 
-  delay(25);
+  delay(20);
 }
 
-
 void playYummy() {
-  for (int thisNote = 0; thisNote < NUM_NOTES; thisNote++) {
-    
-    int noteDuration = 1000 / noteDurations[thisNote];
-    
-    tone(piezoPin, leFestin[thisNote], noteDuration);
-    
-    int pauseBetweenNotes = noteDuration * 1.5;
-    delay(pauseBetweenNotes);
-
+  for (int i = 0; i < NUM_NOTES; i++) {
+    int noteDuration = 1000 / noteDurations[i];
+    tone(piezoPin, leFestin[i], noteDuration);
+    delay(noteDuration * 1.5);
     noTone(piezoPin);
   }
 }
